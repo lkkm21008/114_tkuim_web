@@ -1,0 +1,12 @@
+body {
+  font-family: "Noto Sans TC", sans-serif;
+}
+
+.is-invalid {
+  border: 2px solid #dc3545 !important;
+  background-color: #fff5f5;
+}
+
+.progress-bar {
+  transition: width 0.3s ease;
+}
