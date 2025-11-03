@@ -10,15 +10,17 @@ function validateField(id) {
   let message = '';
 
   if (!input.value.trim()) message = '此欄位為必填。';
-  else if (id === 'email' && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(input.value)) message = '請輸入正確的 Email 格式。';
-  else if (id === 'phone' && !/^09\\d{8}$/.test(input.value)) message = '手機格式錯誤（需為 09 開頭 10 碼）。';
-  else if (id === 'password') {
-    const v = input.value;
-    const hasLetter = /[A-Za-z]/.test(v);
-    const hasNumber = /\\d/.test(v);
-    if (v.length < 8 || !hasLetter || !hasNumber)
-      message = '密碼需至少 8 碼並包含英數字。';
-  } else if (id === 'confirm') {
+else if (id === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value)) message = '請輸入正確的 Email 格式。';
+else if (id === 'phone' && !/^09\d{8}$/.test(input.value)) message = '手機格式錯誤（需為 09 開頭 10 碼）。';
+ else if (id === 'password') {
+  const v = input.value;
+  const hasLetter = /[A-Za-z]/.test(v);
+  const hasNumber = /\d/.test(v);
+  const hasSymbol = /[^A-Za-z0-9]/.test(v); 
+  if (v.length < 8 || !hasLetter || !hasNumber) {
+    message = '密碼需至少 8 碼並包含英數字（可含符號）。';
+  }
+} else if (id === 'confirm') {
     const pw = document.getElementById('password').value;
     if (pw !== input.value) message = '兩次密碼不一致。';
   }
@@ -29,6 +31,7 @@ function validateField(id) {
   saveToLocal();
   return !message;
 }
+
 
 // --- 密碼強度 ---
 function updateStrength() {
