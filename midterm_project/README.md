@@ -37,5 +37,5 @@
 
 
 ## 六、GitHub Pages 網址
-👉 [https://lkkm21009.github.io/plant-diary/]
+👉 https://github.com/lkkm21008/114_tkuim_web/tree/main/midterm_project
 
