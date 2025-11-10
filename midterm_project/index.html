@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌿 植栽日誌與澆水提醒器</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+  <header class="text-center py-4 bg-success text-white">
+    <h1>🌿 我的植栽日誌</h1>
+    <p class="mb-0">記錄植物與澆水日期，別忘了照顧它們！</p>
+  </header>
+
+  <main class="container my-4">
+    <!-- 表單區 -->
+     <button id="themeToggle" class="btn btn-secondary mb-3">🌙 切換深色模式</button>
+
+    <section class="card p-4 shadow-sm">
+      <h4 class="mb-3">新增植物紀錄</h4>
+      <form id="plantForm" class="needs-validation" novalidate>
+        <div class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label for="plantName" class="form-label">植物名稱</label>
+            <input type="text" class="form-control" id="plantName" placeholder="例：龜背芋" required>
+            <div class="invalid-feedback">請輸入植物名稱。</div>
+          </div>
+          <div class="col-md-3">
+            <label for="waterDate" class="form-label">上次澆水日期</label>
+            <input type="date" class="form-control" id="waterDate" required>
+            <div class="invalid-feedback">請選擇日期。</div>
+          </div>
+          <div class="col-md-3">
+            <label for="plantPhoto" class="form-label">上傳植物照片</label>
+            <input type="file" class="form-control" id="plantPhoto" accept="image/*">
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-success w-100">新增</button>
+          </div>
+        </div>
+      </form>
+      <button id="clearAll" class="btn btn-outline-danger mt-3">🧹 一鍵清除全部紀錄</button>
+    </section>
+
+    <!-- 顯示區 -->
+    <section class="mt-4">
+      <h4 class="mb-3">🍀 我的植物清單</h4>
+      <div id="plantList" class="row gy-3"></div>
+    </section>
+  </main>
+
+  <footer class="text-center py-3 bg-success text-white">
+    <p class="mb-0">© 2025 Plant Diary | Designed by 魏筱婕、丁琇緻</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+/* === 深色模式背景統一 === */
+body[data-theme="dark"] {
+  background-color: #0f1a13; /* 整個頁面深墨綠底 */
+  color: #e6ede8;
+  transition: background-color 0.4s, color 0.4s;
+}
+
+/* 包含所有外層背景容器（確保不留白） */
+body[data-theme="dark"],
+body[data-theme="dark"] html,
+body[data-theme="dark"] main,
+body[data-theme="dark"] section,
+body[data-theme="dark"] .main-content,
+body[data-theme="dark"] .content-wrapper {
+  background-color: #0f1a13 !important;
+}
+
+/* header/footer 與卡片顏色保持層次 */
+body[data-theme="dark"] header,
+body[data-theme="dark"] footer {
+  background-color: #123222;
+  color: #d8e4db;
+}
+
+body[data-theme="dark"] .container,
+body[data-theme="dark"] .card {
+  background-color: #1a2b22;
+  border: 1px solid #355c44;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+}
+
+/* 確保頁面底部也有背景 */
+html, body {
+  min-height: 100%;
+}
+
+/* === 深色模式背景統一 === */
+body[data-theme="dark"] {
+  background-color: #0f1a13; /* 整個頁面深墨綠底 */
+  color: #e6ede8;
+  transition: background-color 0.4s, color 0.4s;
+}
+
+/* 包含所有外層背景容器（確保不留白） */
+body[data-theme="dark"],
+body[data-theme="dark"] html,
+body[data-theme="dark"] main,
+body[data-theme="dark"] section,
+body[data-theme="dark"] .main-content,
+body[data-theme="dark"] .content-wrapper {
+  background-color: #3a6c4d !important;
+}
+
+/* header/footer 與卡片顏色保持層次 */
+body[data-theme="dark"] header,
+body[data-theme="dark"] footer {
+  background-color: #3a6c4d;
+  color: #d8e4db;
+}
+
+body[data-theme="dark"] .container,
+body[data-theme="dark"] .card {
+  background-color: #1a2b22;
+  border: 1px solid #355c44;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+}
+body[data-theme="dark"],
+body[data-theme="dark"] h1,
+body[data-theme="dark"] h2,
+body[data-theme="dark"] h3,
+body[data-theme="dark"] h4,
+body[data-theme="dark"] h5,
+body[data-theme="dark"] h6,
+body[data-theme="dark"] p,
+body[data-theme="dark"] label,
+body[data-theme="dark"] span,
+body[data-theme="dark"] li,
+body[data-theme="dark"] a,
+body[data-theme="dark"] th,
+body[data-theme="dark"] td {
+  color: #f0f0f0 !important; /* 統一變白色文字 */
+}
+/* 確保頁面底部也有背景 */
+html, body {
+  min-height: 100%;
+}
