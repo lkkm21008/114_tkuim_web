@@ -37,5 +37,5 @@
 
 
 ## 六、GitHub Pages 網址
-👉 https://github.com/lkkm21008/114_tkuim_web/tree/main/midterm_project
+👉 https://lkkm21008.github.io/114_tkuim_web/midterm_project/
 
