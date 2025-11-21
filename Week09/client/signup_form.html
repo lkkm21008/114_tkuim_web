@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>會員註冊表單</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-light py-4">
+  <div class="container">
+    <h2 class="mb-4 text-center">會員註冊</h2>
+
+    <form id="signup-form" novalidate>
+      <!-- 姓名 -->
+      <div class="mb-3">
+        <label for="name" class="form-label">姓名</label>
+        <input id="name" type="text" class="form-control" required aria-describedby="name-error">
+        <p id="name-error" class="text-danger small" aria-live="polite"></p>
+      </div>
+
+      <!-- Email -->
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input id="email" type="email" class="form-control" required aria-describedby="email-error">
+        <p id="email-error" class="text-danger small" aria-live="polite"></p>
+      </div>
+
+      <!-- 手機 -->
+      <div class="mb-3">
+        <label for="phone" class="form-label">手機</label>
+        <input id="phone" type="tel" pattern="^09\\d{8}$" class="form-control" required aria-describedby="phone-error">
+        <div class="form-text">請輸入 09 開頭的 10 位數字。</div>
+        <p id="phone-error" class="text-danger small" aria-live="polite"></p>
+      </div>
+
+      <!-- 密碼 -->
+      <div class="mb-3">
+        <label for="password" class="form-label">密碼</label>
+        <input id="password" type="password" class="form-control" required minlength="8" aria-describedby="password-error strength-text">
+        <div class="progress mt-2">
+          <div id="strength-bar" class="progress-bar"></div>
+        </div>
+        <p id="strength-text" class="small mb-1 text-muted">請至少包含英文字母與數字。</p>
+        <p id="password-error" class="text-danger small" aria-live="polite"></p>
+      </div>
+
+      <!-- 確認密碼 -->
+      <div class="mb-3">
+        <label for="confirm" class="form-label">確認密碼</label>
+        <input id="confirm" type="password" class="form-control" required aria-describedby="confirm-error">
+        <p id="confirm-error" class="text-danger small" aria-live="polite"></p>
+      </div>
+
+      <!-- 興趣標籤 -->
+      <div class="mb-3">
+        <label class="form-label">興趣（至少選一項）</label>
+        <div id="interests" class="d-flex flex-wrap gap-2">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="coding" value="coding">
+            <label class="form-check-label" for="coding">程式設計</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="music" value="music">
+            <label class="form-check-label" for="music">音樂</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="sports" value="sports">
+            <label class="form-check-label" for="sports">運動</label>
+          </div>
+        </div>
+        <p id="interest-error" class="text-danger small mt-1" aria-live="polite"></p>
+      </div>
+
+      <!-- 服務條款 -->
+      <div class="form-check mb-4">
+        <input id="terms" class="form-check-input" type="checkbox" required aria-describedby="terms-error">
+        <label class="form-check-label" for="terms">我同意服務條款</label>
+        <p id="terms-error" class="text-danger small" aria-live="polite"></p>
+      </div>
+
+      <!-- 按鈕 -->
+      <div class="d-flex gap-2">
+        <button id="submit-btn" class="btn btn-primary" type="submit">註冊</button>
+        <button id="reset-btn" class="btn btn-outline-secondary" type="button">重設</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="signup_form.js"></script>
+</body>
+</html>
