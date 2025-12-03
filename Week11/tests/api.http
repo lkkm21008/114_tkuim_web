@@ -1,0 +1,23 @@
+### 新增
+POST http://localhost:3001/api/signup
+Content-Type: application/json
+
+{
+  "name": "小明",
+  "email": "ming@example.com",
+  "phone": "0912345678"
+}
+
+### 查詢
+GET http://localhost:3001/api/signup?page=1&limit=10
+
+### 更新
+PATCH http://localhost:3001/api/signup/{{id}}
+Content-Type: application/json
+
+{
+  "phone": "0988111222"
+}
+
+### 刪除
+DELETE http://localhost:3001/api/signup/{{id}}
