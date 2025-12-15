@@ -5,22 +5,22 @@
 - Delete 刪除 SQL:DELETE HTTP:DELETE
 
 1.docker compose up -d 啟動容器，docker ps查看容器狀態
-![alt text](image-1.png)
+![alt text](\image\image-1.png)
 
 2.使用Mongo Composs確認Participants集合存在
-![alt text](image.png)
+![alt text](\image\image.png)
 3.npm run dev確保伺服器能連線mongodb
-![alt text](image-2.png)
+![alt text](\image\image-2.png)
 4.完成API
 
 POST /api/signup：建立報名並回傳 _id。
-![alt text](image-3.png)
+![alt text](\image\image-3.png)
 GET /api/signup：回傳清單及 total
-![alt text](image-4.png)
+![alt text](\image\image-4.png)
 PATCH /api/signup/:id：可更新 phone 或 status。
-![alt text](image-5.png)
+![alt text](\image\image-5.png)
 DELETE /api/signup/:id：刪除特定報名。
-![alt text](image-6.png)
+![alt text](\image\image-6.png)
 
 ### Week12
 - 啟動流程
@@ -30,24 +30,35 @@ DELETE /api/signup/:id：刪除特定報名。
 4.  API測試
 - API測試
 1. 未登入
-![alt text](image-7.png)
-1. 建立Student帳號
-![alt text](image-8.png)
-1. 建立Admin帳號
-![alt text](image-9.png)
-1. student 登入->取得token
-![alt text](image-10.png)
-1. admin登入 ->取得token
-![alt text](image-11.png)
-1. student 新增報名
-![alt text](image-12.png)
-1. admin 新增報名
-![alt text](image-13.png)
-1. student 查詢 → 只能看到自己的
-![alt text](image-14.png)
-1. admin 查詢 → 看到全部
-![alt text](image-15.png)
-1. student 嘗試刪除 
-![alt text](image-17.png)
-1.  admin 刪除任一筆 → 204
-![alt text](image-18.png)
+   
+![alt text](\image\image-7.png)
+- 建立Student帳號
+   
+![alt text](\image\image-8.png)
+- 建立Admin帳號
+   
+![alt text](\image\image-9.png)
+- student 登入->取得token
+   
+![alt text](\image\image-10.png)
+- admin登入 ->取得token
+   
+![alt text](\image\image-11.png)
+- student 新增報名
+   
+![alt text](\image\/image-12.png)
+- admin 新增報名
+   
+![alt text](\image\image-13.png)
+- student 查詢 → 只能看到自己的
+   
+![alt text](\image\image-14.png)
+- admin 查詢 → 看到全部
+    
+![alt text](\image\image-15.png)
+-  student 嘗試刪除 
+    
+![alt text](\image\image-17.png)
+-   admin 刪除任一筆 → 204
+
+![alt text](\image\image-18.png)
