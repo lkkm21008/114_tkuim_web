@@ -22,4 +22,32 @@ PATCH /api/signup/:id：可更新 phone 或 status。
 DELETE /api/signup/:id：刪除特定報名。
 ![alt text](image-6.png)
 
-
+### Week12
+- 啟動流程
+1.  啟動MongoDB
+2.  設定環境變數
+3.  啟動後端Server
+4.  API測試
+- API測試
+1. 未登入
+![alt text](image-7.png)
+1. 建立Student帳號
+![alt text](image-8.png)
+1. 建立Admin帳號
+![alt text](image-9.png)
+1. student 登入->取得token
+![alt text](image-10.png)
+1. admin登入 ->取得token
+![alt text](image-11.png)
+1. student 新增報名
+![alt text](image-12.png)
+1. admin 新增報名
+![alt text](image-13.png)
+1. student 查詢 → 只能看到自己的
+![alt text](image-14.png)
+1. admin 查詢 → 看到全部
+![alt text](image-15.png)
+1. student 嘗試刪除 
+![alt text](image-17.png)
+1.  admin 刪除任一筆 → 204
+![alt text](image-18.png)

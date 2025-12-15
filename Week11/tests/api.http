@@ -1,23 +1,94 @@
-### 新增
-POST http://localhost:3001/api/signup
+@base = http://localhost:3001
+@student_token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5M2Y3Zjk0MDZlNTkwMjZkMjQ1NTdlOSIsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzY1NzgwNzgwLCJleHAiOjE3NjU3ODQzODB9.MFoBT8tCk9Kj7Kw5ESitUepvfuDcF679fPJpJyy3gm0
+@admin_token =eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5M2Y4NTE2MDZlNTkwMjZkMjQ1NTdlZSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2NTc4MDgyMiwiZXhwIjoxNzY1Nzg0NDIyfQ.vP_N2yVTlQ19frXLB-XLXLnx5pHAmsXolA5-2k4hoPI
+@any_id =693f823d06e59026d24557eb
+@other_id =692ff6145f4d1045d49dc29d
+###
+# 0. 未登入 → 一定要被拒
+GET {{base}}/api/signup
+
+###
+# 1. 建立 student 帳號
+POST {{base}}/auth/signup
 Content-Type: application/json
 
 {
-  "name": "小明",
-  "email": "ming@example.com",
-  "phone": "0912345678"
+  "email": "student@test.com",
+  "password": "123456",
+  "role": "student"
 }
 
-### 查詢
-GET http://localhost:3001/api/signup?page=1&limit=10
-
-### 更新
-PATCH http://localhost:3001/api/signup/{{id}}
+###
+# 2. 建立 admin 帳號
+POST {{base}}/auth/signup
 Content-Type: application/json
 
 {
-  "phone": "0988111222"
+  "email": "admin3@test.com",
+  "password": "123456",
+  "role": "admin"
 }
 
-### 刪除
-DELETE http://localhost:3001/api/signup/{{id}}
+###
+# 3. student 登入 → 取得 token
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "student@test.com",
+  "password": "123456"
+}
+
+###
+# 4. admin 登入 → 取得 token
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin3@test.com",
+  "password": "123456"
+}
+
+###
+# 5. student 新增報名（請把 token 貼上）
+POST {{base}}/api/signup
+Authorization: Bearer {{student_token}}
+Content-Type: application/json
+
+{
+  "name": "學生A",
+  "email": "a@student.com",
+  "phone": "0911111111"
+}
+
+###
+# 6. admin 新增報名（請把 token 貼上）
+POST {{base}}/api/signup
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "name": "管理員B",
+  "email": "b@admin.com",
+  "phone": "0922222222"
+}
+
+###
+# 7. student 查詢 → 只能看到自己的
+GET {{base}}/api/signup
+Authorization: Bearer {{student_token}}
+
+###
+# 8. admin 查詢 → 看到全部
+GET {{base}}/api/signup
+Authorization: Bearer {{admin_token}}
+
+###
+# 9. student 嘗試刪除「不是自己的 id」→ 403
+DELETE {{base}}/api/signup/{{other_id}}
+Authorization: Bearer {{student_token}}
+
+###
+# 10. admin 刪除任一筆 → 204
+DELETE {{base}}/api/signup/{{any_id}}
+Authorization: Bearer {{admin_token}}
