@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn More | Stay Focused</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">Workspace</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <!-- We can add more real pages later, keeping anchors for now if they exist on this page, or placeholders -->
+                <a href="#philosophy">Philosophy</a>
+                <a href="#features">Features</a>
+                <a href="index.html#get-started" class="btn btn-sm">Get Started</a>
+            </div>
+            <button class="mobile-menu-btn" aria-label="Menu">
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container" style="padding-top: 120px; padding-bottom: 60px;">
+        <div style="max-width: 800px; margin: 0 auto;">
+            <h1 class="fade-in" style="font-size: 3rem; margin-bottom: 2rem;">The Philosophy of Focus.</h1>
+
+            <section id="philosophy" class="fade-in delay-1" style="margin-bottom: 4rem;">
+                <p style="font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+                    In a world of constant distractions, finding space to think is a luxury. We built Workspace to
+                    reclaim that space.
+                    It's not just about what you do, it's about what you don't do.
+                </p>
+                <p style="font-size: 1.125rem; color: var(--text-secondary);">
+                    Our minimalist approach strips away the non-essential, leaving you with a clean canvas for your best
+                    work.
+                </p>
+            </section>
+
+            <section id="features" class="fade-in delay-2">
+                <h2 style="font-size: 2rem; margin-bottom: 1.5rem;">Core Features</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div style="padding: 1.5rem; background: #f9fafb; border-radius: 8px;">
+                        <h3 style="margin-bottom: 0.5rem;">Distraction Free</h3>
+                        <p style="color: var(--text-secondary);">No notifications, no badges, just you and your work.
+                        </p>
+                    </div>
+                    <div style="padding: 1.5rem; background: #f9fafb; border-radius: 8px;">
+                        <h3 style="margin-bottom: 0.5rem;">Cloud Sync</h3>
+                        <p style="color: var(--text-secondary);">Your work, everywhere you go, instantly available.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
