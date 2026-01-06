@@ -18,8 +18,8 @@ function setMode(newMode) {
   document.body.dataset.mode = mode;
 
   const hint = mode === "admin"
-    ? "管理者：可新增/刪除活動、管理參與者"
-    : "使用者：可報名與簽到（不顯示管理功能）";
+    ? "管理者：可新增/刪除活動、管理參與者、查看名單/簽到與刪除報名"
+    : "使用者：可填寫資料報名活動，報名成功會跳出提示窗";
 
   const h1 = document.getElementById("modeHint1");
   const h2 = document.getElementById("modeHint2");
@@ -28,7 +28,7 @@ function setMode(newMode) {
   if (h2) h2.textContent = hint;
   if (h3) h3.textContent = hint;
 
-  // User 模式預設跳到 registrations
+  // 使用者模式預設跳到名單/簽到頁
   if (mode === "user") activateTab("registrations");
   refreshAll();
 }
@@ -53,7 +53,7 @@ function showToast(type, msg) {
   el.textContent = msg;
 
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.add("hidden"), 2800);
+  toastTimer = setTimeout(() => el.classList.add("hidden"), 2600);
 }
 
 // ===== Helpers =====
@@ -63,7 +63,6 @@ async function apiFetch(url, options = {}) {
     ...options,
   });
 
-  // 非 JSON 也要保底
   let data = null;
   const ct = res.headers.get("content-type") || "";
   if (ct.includes("application/json")) {
@@ -87,7 +86,6 @@ function el(id) { return document.getElementById(id); }
 
 function fmtDate(s) {
   if (!s) return "";
-  // 若是 YYYY-MM-DD 直接回傳
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
   const d = new Date(s);
   if (Number.isNaN(d.getTime())) return s;
@@ -101,7 +99,7 @@ function safeText(v) {
 // ===== State =====
 let events = [];
 let participants = [];
-let regs = []; // registrations list for selected event
+let regs = [];
 
 // ===== Tabs =====
 function activateTab(name) {
@@ -131,6 +129,8 @@ function renderEventSelects() {
 }
 
 function renderParticipantSelect() {
+  // 管理者模式下其實不需要報名表單，所以不用再渲染 regParticipantSelect
+  // 但保留不影響
   const sel = el("regParticipantSelect");
   if (!sel) return;
 
@@ -149,23 +149,20 @@ function renderEventsTable() {
 
   if (cnt) cnt.textContent = `共 ${events.length} 筆`;
 
-  tbody.innerHTML = events.map(e => {
-    return `
-      <tr>
-        <td>${safeText(fmtDate(e.date))}</td>
-        <td>${safeText(e.title)}</td>
-        <td>${safeText(e.location)}</td>
-        <td>${safeText(e.quota)}</td>
-        <td>
-          <button class="btn danger" data-act="delEvent" data-id="${e._id}">刪除</button>
-        </td>
-      </tr>
-    `;
-  }).join("") || `
+  tbody.innerHTML = events.map(e => `
+    <tr>
+      <td>${safeText(fmtDate(e.date))}</td>
+      <td>${safeText(e.title)}</td>
+      <td>${safeText(e.location)}</td>
+      <td>${safeText(e.quota)}</td>
+      <td>
+        <button class="btn danger" data-act="delEvent" data-id="${e._id}">刪除</button>
+      </td>
+    </tr>
+  `).join("") || `
     <tr><td colspan="5" class="muted">目前沒有活動，請先新增。</td></tr>
   `;
 
-  // Bind delete
   tbody.querySelectorAll('[data-act="delEvent"]').forEach(btn => {
     btn.addEventListener("click", async () => {
       if (mode === "user") return showToast("err", "此功能僅限管理者使用");
@@ -190,18 +187,16 @@ function renderParticipantsTable() {
 
   if (cnt) cnt.textContent = `共 ${participants.length} 筆`;
 
-  tbody.innerHTML = participants.map(p => {
-    return `
-      <tr>
-        <td>${safeText(p.name)}</td>
-        <td>${safeText(p.email)}</td>
-        <td>${safeText(p.phone || "")}</td>
-        <td>
-          <button class="btn danger" data-act="delP" data-id="${p._id}">刪除</button>
-        </td>
-      </tr>
-    `;
-  }).join("") || `
+  tbody.innerHTML = participants.map(p => `
+    <tr>
+      <td>${safeText(p.name)}</td>
+      <td>${safeText(p.email)}</td>
+      <td>${safeText(p.phone || "")}</td>
+      <td>
+        <button class="btn danger" data-act="delP" data-id="${p._id}">刪除</button>
+      </td>
+    </tr>
+  `).join("") || `
     <tr><td colspan="4" class="muted">目前沒有參與者，請先新增。</td></tr>
   `;
 
@@ -233,36 +228,40 @@ function renderRegsTable() {
       : `<span class="badge no">未簽到</span>`;
 
     const p = r.participant || {};
+    // 管理者才顯示「取消報名」按鈕；使用者只看名單與簽到按鈕（也可限制只管理者簽到）
+    const adminActions = mode === "admin" ? `
+      <button class="btn" data-act="toggleCheckin" data-id="${r._id}">
+        ${checked ? "取消簽到" : "簽到"}
+      </button>
+      <button class="btn danger" data-act="cancelReg" data-id="${r._id}">
+        刪除報名
+      </button>
+    ` : `
+      <button class="btn" data-act="toggleCheckin" data-id="${r._id}">
+        ${checked ? "取消簽到" : "簽到"}
+      </button>
+    `;
+
     return `
       <tr>
         <td>${safeText(p.name || "")}</td>
         <td>${safeText(p.email || "")}</td>
         <td>${safeText(p.phone || "")}</td>
         <td>${badge}</td>
-        <td>
-          <button class="btn" data-act="toggleCheckin" data-id="${r._id}" data-checked="${checked ? "1" : "0"}">
-            ${checked ? "取消簽到" : "簽到"}
-          </button>
-          <button class="btn danger" data-act="cancelReg" data-id="${r._id}">
-            取消報名
-          </button>
-        </td>
+        <td>${adminActions}</td>
       </tr>
     `;
   }).join("") || `
     <tr><td colspan="5" class="muted">此活動目前沒有報名紀錄。</td></tr>
   `;
 
-  // Bind actions
+  // 簽到
   tbody.querySelectorAll('[data-act="toggleCheckin"]').forEach(btn => {
     btn.addEventListener("click", async () => {
       const id = btn.dataset.id;
-      const isChecked = btn.dataset.checked === "1";
       try {
-        // 你的後端若只提供「簽到」而沒有「取消簽到」，這裡會需要你後端支援。
-        // 先用同一支 PATCH 讓後端自行切換或簽到即可。
         await apiFetch(API.checkin(id), { method: "PATCH" });
-        showToast("ok", isChecked ? "已取消簽到" : "已簽到");
+        showToast("ok", "已更新簽到狀態");
         await loadEventRegsIfNeeded();
       } catch (e) {
         showToast("err", `操作失敗：${e.message}`);
@@ -270,16 +269,18 @@ function renderRegsTable() {
     });
   });
 
+  // 刪除報名（管理者）
   tbody.querySelectorAll('[data-act="cancelReg"]').forEach(btn => {
     btn.addEventListener("click", async () => {
+      if (mode !== "admin") return showToast("err", "此功能僅限管理者使用");
       const id = btn.dataset.id;
-      if (!confirm("確定取消報名？")) return;
+      if (!confirm("確定刪除此筆報名？")) return;
       try {
         await apiFetch(API.cancelReg(id), { method: "DELETE" });
-        showToast("ok", "已取消報名");
+        showToast("ok", "已刪除報名");
         await loadEventRegsIfNeeded();
       } catch (e) {
-        showToast("err", `取消失敗：${e.message}`);
+        showToast("err", `刪除失敗：${e.message}`);
       }
     });
   });
@@ -289,7 +290,6 @@ function renderRegsTable() {
 async function checkAPI() {
   const status = el("apiStatus");
   try {
-    // 用 events GET 當作健康檢查
     await apiFetch(API.events, { method: "GET" });
     if (status) status.textContent = "API: 正常";
   } catch (e) {
@@ -301,7 +301,6 @@ async function checkAPI() {
 async function loadEvents() {
   try {
     const data = await apiFetch(API.events, { method: "GET" });
-    // 可能回傳 array 或 {ok, events}
     events = Array.isArray(data) ? data : (data.events || []);
     renderEventsTable();
     renderEventSelects();
@@ -341,18 +340,16 @@ async function refreshAll() {
   await checkAPI();
   await loadEvents();
   await loadParticipants();
-  // registrations tab 需要 event list 的 select options，載入後再抓名單
   await loadEventRegsIfNeeded();
 }
 
-// ===== Bind UI events =====
+// ===== Bind UI =====
 function bindNav() {
   document.querySelectorAll(".nav").forEach((b) => {
     b.addEventListener("click", () => {
       const tab = b.dataset.tab;
-      // user 模式：不讓切到管理 tab
       if (mode === "user" && (tab === "events" || tab === "participants")) {
-        showToast("err", "使用者模式僅提供報名與簽到功能");
+        showToast("err", "使用者模式僅提供報名與名單功能");
         activateTab("registrations");
         return;
       }
@@ -362,7 +359,7 @@ function bindNav() {
 }
 
 function bindForms() {
-  // Create Event
+  // 新增活動
   const eventForm = el("eventForm");
   eventForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -392,7 +389,7 @@ function bindForms() {
     }
   });
 
-  // Create Participant
+  // 新增參與者（管理者）
   const pForm = el("participantForm");
   pForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -419,41 +416,59 @@ function bindForms() {
     }
   });
 
-  // Registration
+  // 報名（使用者模式才會看到表單）
   const regForm = el("regForm");
   regForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const eventId = el("regEventSelect")?.value;
-    const participantId = el("regParticipantSelect")?.value;
-
-    if (!eventId || !participantId) {
-      showToast("err", "請先選擇活動與參與者");
+    if (mode !== "user") {
+      // 管理者看不到這個表單（被 user-only 隱藏），這裡只是保底
+      showToast("err", "管理者模式不提供報名操作（僅查看名單/簽到）");
       return;
     }
 
+    const eventId = el("regEventSelect")?.value;
+    const name = el("uName")?.value?.trim();
+    const email = el("uEmail")?.value?.trim();
+    const phone = el("uPhone")?.value?.trim() || "";
+
+    if (!eventId) return showToast("err", "請選擇活動");
+    if (!name || !email) return showToast("err", "請填寫姓名與 Email");
+
     try {
+      // 1) 建立參與者
+      const pRes = await apiFetch(API.participants, {
+        method: "POST",
+        body: JSON.stringify({ name, email, phone }),
+      });
+      const participantId = pRes?._id || pRes?.participant?._id;
+      if (!participantId) throw new Error("建立參與者失敗（未取得 participantId）");
+
+      // 2) 建立報名
       await apiFetch(API.registrations, {
         method: "POST",
         body: JSON.stringify({ eventId, participantId }),
       });
-      showToast("ok", "報名成功");
-      // 切到該活動名單
+
+      // ✅ 你要的：跳出提示窗
+      alert("報名成功！我們已收到你的報名資料。");
+
+      // 更新名單
       el("listEventSelect").value = eventId;
+      regForm.reset();
+      await loadParticipants(); // 讓 admin 下次進去也看得到新參與者
       await loadEventRegsIfNeeded();
     } catch (err) {
-      // 重複報名通常是 409
       if (err.status === 409) {
-        showToast("err", "重複報名：此參與者已報名該活動");
+        alert("此參與者已報名過該活動（重複報名）");
       } else {
-        showToast("err", `報名失敗：${err.message}`);
+        alert(`報名失敗：${err.message}`);
       }
     }
   });
 
   el("reloadEventsBtn")?.addEventListener("click", loadEvents);
   el("reloadParticipantsBtn")?.addEventListener("click", loadParticipants);
-
   el("refreshListBtn")?.addEventListener("click", loadEventRegsIfNeeded);
   el("listEventSelect")?.addEventListener("change", loadEventRegsIfNeeded);
 }
@@ -461,5 +476,5 @@ function bindForms() {
 window.addEventListener("DOMContentLoaded", () => {
   bindNav();
   bindForms();
-  initModeUI(); // initModeUI 會呼叫 refreshAll()
+  initModeUI();
 });

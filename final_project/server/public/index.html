@@ -33,14 +33,13 @@
     <aside class="sidebar">
       <button class="nav active" data-tab="events">活動管理</button>
       <button class="nav" data-tab="participants">參與者管理</button>
-      <button class="nav" data-tab="registrations">報名 / 名單 / 簽到</button>
+      <button class="nav" data-tab="registrations">名單 / 簽到</button>
 
       <div class="hint">
         <div class="hintTitle">使用提示</div>
         <ul>
-          <li>管理者模式：可新增/刪除活動與參與者。</li>
-          <li>使用者模式：只顯示報名與簽到相關功能。</li>
-          <li>建議：先新增活動與參與者，再到「報名」進行報名。</li>
+          <li>管理者模式：可新增/刪除活動、管理參與者，並查看名單/簽到。</li>
+          <li>使用者模式：可填寫資料報名活動，報名成功會跳出提示窗。</li>
         </ul>
       </div>
     </aside>
@@ -113,7 +112,7 @@
         </div>
 
         <div class="panelInner">
-          <h3>新增參與者</h3>
+          <h3>新增參與者（管理者）</h3>
           <form id="participantForm" class="form grid">
             <div class="field">
               <label>姓名</label>
@@ -137,7 +136,7 @@
 
         <div class="panelInner">
           <div class="row">
-            <h3>參與者列表</h3>
+            <h3>參與者列表（可刪除）</h3>
             <div class="muted" id="participantsCount"></div>
           </div>
           <table class="table">
@@ -154,34 +153,45 @@
         </div>
       </section>
 
-      <!-- 報名/名單/簽到（兩種模式都可用；但 user 模式只能看到這個 tab） -->
+      <!-- 名單 / 簽到 -->
       <section id="tab-registrations" class="panel">
         <div class="row">
-          <h2>報名 / 名單 / 簽到</h2>
+          <h2>名單 / 簽到</h2>
           <div class="muted" id="modeHint3"></div>
         </div>
 
-        <div class="panelInner">
-          <h3>活動報名</h3>
+        <!-- 使用者模式：才顯示報名表單 -->
+        <div class="panelInner user-only">
+          <h3>活動報名（使用者）</h3>
           <form id="regForm" class="form grid">
-            <div class="field">
+            <div class="field full">
               <label>選擇活動</label>
               <select id="regEventSelect" required></select>
             </div>
             <div class="field">
-              <label>選擇參與者</label>
-              <select id="regParticipantSelect" required></select>
+              <label>姓名</label>
+              <input id="uName" placeholder="請輸入姓名" required />
             </div>
+            <div class="field">
+              <label>Email</label>
+              <input id="uEmail" type="email" placeholder="example@test.com" required />
+            </div>
+            <div class="field full">
+              <label>電話（可選）</label>
+              <input id="uPhone" placeholder="0912-345-678" />
+            </div>
+
             <div class="row fullRow">
               <button class="btn primary" type="submit">送出報名</button>
-              <span class="muted">（系統會避免重複報名）</span>
+              <span class="muted">報名成功會跳出提示窗</span>
             </div>
           </form>
         </div>
 
+        <!-- 管理者/使用者：都可以看名單（管理者才有刪除/簽到操作也可保留） -->
         <div class="panelInner">
           <div class="row">
-            <h3>名單 / 簽到</h3>
+            <h3>報名名單</h3>
             <div class="rowRight">
               <select id="listEventSelect" aria-label="event list select"></select>
               <button class="btn" id="refreshListBtn" type="button">載入名單</button>
@@ -202,7 +212,7 @@
           </table>
 
           <div class="muted" style="margin-top:10px">
-            * 簽到/取消簽到為示範流程；取消報名會刪除該筆報名紀錄。
+            * 管理者可簽到/取消簽到、取消報名（刪除報名紀錄）。
           </div>
         </div>
       </section>
