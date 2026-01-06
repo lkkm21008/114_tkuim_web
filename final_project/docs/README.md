@@ -107,19 +107,19 @@ npm run dev
 Server running on port 3001
 在瀏覽器開啟：
 http://localhost:3001/
-
-六、API 測試方式
+```
+## 六、API 測試方式
 
 本專案提供 api.http 檔案，可使用 VS Code REST Client 套件測試所有 API。
 
 測試內容包含：
 
--活動 CRUD
+- 活動 CRUD
 
--參與者 CRUD
+- 參與者 CRUD
 
--活動報名
+- 活動報名
 
--名單查詢
+- 名單查詢
 
--簽到與取消簽到
+- 簽到與取消簽到
