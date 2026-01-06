@@ -149,17 +149,30 @@ function renderEventsTable() {
 
   if (cnt) cnt.textContent = `共 ${events.length} 筆`;
 
-  tbody.innerHTML = events.map(e => `
+  const myRegs = JSON.parse(localStorage.getItem("my_regs") || "[]");
+
+  tbody.innerHTML = events.map(e => {
+    const isReg = myRegs.includes(e._id);
+    const statusBadge = isReg ? `<span class="badge ok">已報名</span>` : "";
+    const delBtn = mode === "admin"
+      ? `<button class="btn danger" data-act="delEvent" data-id="${e._id}">刪除</button>`
+      : "";
+
+    return `
     <tr>
       <td>${safeText(fmtDate(e.date))}</td>
-      <td>${safeText(e.title)}</td>
+      <td>
+        ${safeText(e.title)}
+        ${statusBadge}
+      </td>
       <td>${safeText(e.location)}</td>
       <td>${safeText(e.quota)}</td>
       <td>
-        <button class="btn danger" data-act="delEvent" data-id="${e._id}">刪除</button>
+        ${delBtn}
       </td>
     </tr>
-  `).join("") || `
+    `;
+  }).join("") || `
     <tr><td colspan="5" class="muted">目前沒有活動，請先新增。</td></tr>
   `;
 
@@ -229,17 +242,20 @@ function renderRegsTable() {
 
     const p = r.participant || {};
     // 管理者才顯示「取消報名」按鈕；使用者只看名單與簽到按鈕（也可限制只管理者簽到）
-    const adminActions = mode === "admin" ? `
+    // 依需求移除「取消簽到」功能：已簽到就不顯示按鈕
+    const checkinBtn = !checked ? `
       <button class="btn" data-act="toggleCheckin" data-id="${r._id}">
-        ${checked ? "取消簽到" : "簽到"}
+        簽到
       </button>
+    ` : "";
+
+    const adminActions = mode === "admin" ? `
+      ${checkinBtn}
       <button class="btn danger" data-act="cancelReg" data-id="${r._id}">
         刪除報名
       </button>
     ` : `
-      <button class="btn" data-act="toggleCheckin" data-id="${r._id}">
-        ${checked ? "取消簽到" : "簽到"}
-      </button>
+      ${checkinBtn}
     `;
 
     return `
@@ -348,7 +364,7 @@ function bindNav() {
   document.querySelectorAll(".nav").forEach((b) => {
     b.addEventListener("click", () => {
       const tab = b.dataset.tab;
-      if (mode === "user" && (tab === "events" || tab === "participants")) {
+      if (mode === "user" && tab === "participants") {
         showToast("err", "使用者模式僅提供報名與名單功能");
         activateTab("registrations");
         return;
@@ -453,11 +469,19 @@ function bindForms() {
       // ✅ 你要的：跳出提示窗
       alert("報名成功！我們已收到你的報名資料。");
 
+      // Update LocalStorage
+      const myRegs = JSON.parse(localStorage.getItem("my_regs") || "[]");
+      if (!myRegs.includes(eventId)) {
+        myRegs.push(eventId);
+        localStorage.setItem("my_regs", JSON.stringify(myRegs));
+      }
+
       // 更新名單
       el("listEventSelect").value = eventId;
       regForm.reset();
       await loadParticipants(); // 讓 admin 下次進去也看得到新參與者
       await loadEventRegsIfNeeded();
+      await loadEvents(); // 更新活動列表的狀態 (已報名)
     } catch (err) {
       if (err.status === 409) {
         alert("此參與者已報名過該活動（重複報名）");
