@@ -55,7 +55,52 @@ Activity Registration & Participant Management System
 ]
 ```
 
-###  3. 刪除活動
+
+###  3. 取得單一活動
+- **URL**：`/api/events/:id`
+- **Method**：`GET`
+
+Path Parameter
+| 參數 | 說明     |
+| -- | ------ |
+| id | 活動 ID |
+
+#### Response（200）
+```json
+{
+  "_id": "65a1b2c3d4e5f67890123456",
+  "title": "期末專題 Demo Day",
+  "date": "2026-01-10",
+  "location": "E201 教室",
+  "quota": 30,
+  "description": "可留空"
+}
+```
+
+###  4. 更新活動
+- **URL**：`/api/events/:id`
+- **Method**：`PUT`
+
+Path Parameter
+| 參數 | 說明     |
+| -- | ------ |
+| id | 活動 ID |
+
+#### Request Body
+| 欄位 | 型別 | 必填 | 說明 |
+|---|---|---|---|
+| title | string | 否 | 活動名稱 |
+| date | string | 否 | 日期 |
+| location | string | 否 | 地點 |
+| quota | number | 否 | 名額 |
+| description | string | 否 | 描述 |
+
+#### Response（200）
+```json
+{ "ok": true }
+```
+
+###  5. 刪除活動
 - **URL**：`/api/events/:id`
 - **Method**：`DELETE`
 
@@ -69,7 +114,7 @@ id	     活動ID
   { "ok": true }
 ```
 
-###  4. 查詢活動報名名單
+###  6. 查詢活動報名名單
 - **URL**：`/api/events/:eventId/registrations`
 - **Method**：`GET`
 
@@ -132,7 +177,38 @@ eventId	     活動ID
 ]
 ```
 
-###  3. 刪除參與者
+
+###  3. 取得單一參與者
+- **URL**：`/api/participants/:id`
+- **Method**：`GET`
+
+#### Response（200）
+```json
+{
+  "_id": "65c222222222222222222222",
+  "name": "王小明",
+  "email": "ming@test.com",
+  "phone": "0912-345-678"
+}
+```
+
+###  4. 更新參與者
+- **URL**：`/api/participants/:id`
+- **Method**：`PUT`
+
+#### Request Body
+| 欄位 | 型別 | 必填 | 說明 |
+|---|---|---|---|
+| name | string | 否 | 姓名 |
+| email | string | 否 | Email |
+| phone | string | 否 | 電話 |
+
+#### Response（200）
+```json
+{ "ok": true }
+```
+
+###  5. 刪除參與者
 - **URL**：`/api/participants/:id`
 - **Method**：`DELETE`
 | 參數 | 說明     |
