@@ -11,7 +11,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-
+app.use(express.static("public"));
 app.use("/api/events", eventsRoutes);
 app.use("/api/participants", participantsRoutes);
 app.use("/api/registrations", registrationsRoutes);

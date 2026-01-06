@@ -22,7 +22,7 @@ GET {{base}}/api/events
 
 ### 1-3 Get Event by Id
 # 先跑 1-2，複製其中一筆 _id，貼到下面
-@event_id = 695d004b579d4b2f4d43be0e
+@event_id = 695d0eddc4c970e6e25c87ad
 GET {{base}}/api/events/{{event_id}}
 
 ### 1-4 Update Event
@@ -60,7 +60,7 @@ GET {{base}}/api/participants
 
 ### 2-3 Get Participant by Id
 # 先跑 2-2，複製其中一筆 _id，貼到下面
-@participant_id = 695d01b2b0385841d1d6807d
+@participant_id = 695d0efdc4c970e6e25c87ae
 GET {{base}}/api/participants/{{participant_id}}
 
 ### 2-4 Update Participant
@@ -87,8 +87,8 @@ POST {{base}}/api/registrations
 Content-Type: application/json
 
 {
-  "eventId": "{{event_id}}",
-  "participantId": "{{participant_id}}"
+  "eventId": "695d0eddc4c970e6e25c87ad",
+  "participantId": "695d0efdc4c970e6e25c87ae"
 }
 
 ### 3-2 List Registrations by Event (某活動名單)
@@ -96,7 +96,7 @@ GET {{base}}/api/events/{{event_id}}/registrations
 
 ### 3-3 Check-in (簽到)
 # 先跑 3-2，複製其中一筆 registration 的 _id，貼到下面
-@registration_id = PUT_REGISTRATION_ID_HERE
+@registration_id = 695d0f54c4c970e6e25c87af
 PATCH {{base}}/api/registrations/{{registration_id}}/checkin
 
 ### 3-4 Cancel Registration (取消/刪除報名)
