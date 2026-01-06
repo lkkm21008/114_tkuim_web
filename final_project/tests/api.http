@@ -1,9 +1,11 @@
 @base = http://localhost:3001
 
-### 0) Health（如果你有 health）
-GET {{base}}/health
 
-### 1) 建立活動（Create Event）
+############################################
+### 1) EVENTS（活動）
+############################################
+
+### 1-1 Create Event
 POST {{base}}/api/events
 Content-Type: application/json
 
@@ -15,15 +17,15 @@ Content-Type: application/json
   "description": "活動報名系統展示"
 }
 
-### 2) 取得所有活動（List Events）
+### 1-2 List Events
 GET {{base}}/api/events
 
-### 3) 取得單一活動（Get Event by Id）
-# 先跑 2) 取得列表，複製其中一筆 _id 貼到下面
-@event_id = PUT_EVENT_ID_HERE
+### 1-3 Get Event by Id
+# 先跑 1-2，複製其中一筆 _id，貼到下面
+@event_id = 695d004b579d4b2f4d43be0e
 GET {{base}}/api/events/{{event_id}}
 
-### 4) 更新活動（Update Event）
+### 1-4 Update Event
 PUT {{base}}/api/events/{{event_id}}
 Content-Type: application/json
 
@@ -35,5 +37,67 @@ Content-Type: application/json
   "description": "已更新內容"
 }
 
-### 5) 刪除活動（Delete Event）
+### 1-5 Delete Event
 DELETE {{base}}/api/events/{{event_id}}
+
+
+############################################
+### 2) PARTICIPANTS（參與者）
+############################################
+
+### 2-1 Create Participant
+POST {{base}}/api/participants
+Content-Type: application/json
+
+{
+  "name": "王小明",
+  "email": "ming@test.com",
+  "phone": "0912-345-678"
+}
+
+### 2-2 List Participants
+GET {{base}}/api/participants
+
+### 2-3 Get Participant by Id
+# 先跑 2-2，複製其中一筆 _id，貼到下面
+@participant_id = 695d01b2b0385841d1d6807d
+GET {{base}}/api/participants/{{participant_id}}
+
+### 2-4 Update Participant
+PUT {{base}}/api/participants/{{participant_id}}
+Content-Type: application/json
+
+{
+  "name": "王小明（更新）",
+  "email": "ming@test.com",
+  "phone": "0900-000-000"
+}
+
+### 2-5 Delete Participant
+DELETE {{base}}/api/participants/{{participant_id}}
+
+
+############################################
+### 3) REGISTRATIONS（報名/名單/簽到）
+############################################
+
+### 3-1 Register (報名)
+# 需要 event_id + participant_id（請先跑 events / participants 的 list 取得 id）
+POST {{base}}/api/registrations
+Content-Type: application/json
+
+{
+  "eventId": "{{event_id}}",
+  "participantId": "{{participant_id}}"
+}
+
+### 3-2 List Registrations by Event (某活動名單)
+GET {{base}}/api/events/{{event_id}}/registrations
+
+### 3-3 Check-in (簽到)
+# 先跑 3-2，複製其中一筆 registration 的 _id，貼到下面
+@registration_id = PUT_REGISTRATION_ID_HERE
+PATCH {{base}}/api/registrations/{{registration_id}}/checkin
+
+### 3-4 Cancel Registration (取消/刪除報名)
+DELETE {{base}}/api/registrations/{{registration_id}}

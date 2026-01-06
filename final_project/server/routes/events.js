@@ -1,4 +1,6 @@
 import express from "express";
+import { listByEvent } from "../repositories/registrationsRepo.js";
+import { ObjectId } from "mongodb";
 import {
   createEvent,
   getEvents,
@@ -37,6 +39,18 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   await deleteEvent(req.params.id);
   res.json({ ok: true });
+});
+
+// 某活動的報名名單
+router.get("/:eventId/registrations", async (req, res) => {
+  const { eventId } = req.params;
+
+  if (!ObjectId.isValid(eventId)) {
+    return res.status(400).json({ ok: false, error: "Invalid event id" });
+  }
+
+  const list = await listByEvent(eventId);
+  res.json(list);
 });
 
 export default router; // 
