@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>活動報名與參與者管理系統</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
@@ -15,163 +15,197 @@
         <div class="subtitle">Events • Participants • Registrations</div>
       </div>
     </div>
+
     <div class="actions">
-      <button id="btnReload" class="btn ghost">重新載入</button>
-      <span id="status" class="status">就緒</span>
+      <div class="status" id="apiStatus">API: 檢查中…</div>
+
+      <div class="modeBar">
+        <span class="modeLabel">模式</span>
+        <select id="modeSelect" aria-label="mode select">
+          <option value="admin">管理者模式</option>
+          <option value="user">使用者模式</option>
+        </select>
+      </div>
     </div>
   </header>
 
   <main class="layout">
     <aside class="sidebar">
-      <button class="nav active" data-view="events">活動管理</button>
-      <button class="nav" data-view="participants">參與者管理</button>
-      <button class="nav" data-view="registrations">報名 / 名單 / 簽到</button>
+      <button class="nav active" data-tab="events">活動管理</button>
+      <button class="nav" data-tab="participants">參與者管理</button>
+      <button class="nav" data-tab="registrations">報名 / 名單 / 簽到</button>
+
       <div class="hint">
         <div class="hintTitle">使用提示</div>
         <ul>
-          <li>先新增「活動」與「參與者」</li>
-          <li>到「報名」選活動 + 參與者進行報名</li>
-          <li>名單頁可簽到 / 取消</li>
+          <li>管理者模式：可新增/刪除活動與參與者。</li>
+          <li>使用者模式：只顯示報名與簽到相關功能。</li>
+          <li>建議：先新增活動與參與者，再到「報名」進行報名。</li>
         </ul>
       </div>
     </aside>
 
     <section class="content">
+      <div id="toast" class="toast hidden"></div>
 
-      <!-- EVENTS -->
-      <section id="view-events" class="view">
-        <div class="panel">
+      <!-- 活動管理（管理者） -->
+      <section id="tab-events" class="panel admin-only">
+        <div class="row">
           <h2>活動管理</h2>
-          <form id="formEvent" class="form grid">
-            <div class="field">
+          <div class="muted" id="modeHint1"></div>
+        </div>
+
+        <div class="panelInner">
+          <h3>新增活動</h3>
+          <form id="eventForm" class="form grid">
+            <div class="field full">
               <label>活動名稱</label>
-              <input name="title" placeholder="例：期末專題 Demo Day" required />
+              <input id="eventTitle" placeholder="例：期末專題 Demo Day" required />
             </div>
             <div class="field">
               <label>日期</label>
-              <input name="date" type="date" required />
+              <input id="eventDate" type="date" required />
             </div>
             <div class="field">
               <label>地點</label>
-              <input name="location" placeholder="例：E201 教室" required />
+              <input id="eventLocation" placeholder="例：E201 教室" required />
             </div>
             <div class="field">
               <label>名額</label>
-              <input name="quota" type="number" min="1" value="30" required />
+              <input id="eventQuota" type="number" min="1" value="30" required />
             </div>
             <div class="field full">
-              <label>描述</label>
-              <input name="description" placeholder="可留空" />
+              <label>描述（可留空）</label>
+              <input id="eventDesc" placeholder="可留空" />
             </div>
-            <div class="field full">
+            <div class="row fullRow">
               <button class="btn primary" type="submit">新增活動</button>
+              <button class="btn ghost" type="button" id="reloadEventsBtn">重新載入</button>
             </div>
           </form>
         </div>
 
-        <div class="panel">
+        <div class="panelInner">
           <div class="row">
             <h3>活動列表</h3>
+            <div class="muted" id="eventsCount"></div>
           </div>
-          <table class="table" id="tableEvents">
+          <table class="table">
             <thead>
               <tr>
                 <th>日期</th>
                 <th>名稱</th>
                 <th>地點</th>
                 <th>名額</th>
-                <th style="width:120px;">操作</th>
+                <th>操作</th>
               </tr>
             </thead>
-            <tbody></tbody>
+            <tbody id="eventsTbody"></tbody>
           </table>
         </div>
       </section>
 
-      <!-- PARTICIPANTS -->
-      <section id="view-participants" class="view hidden">
-        <div class="panel">
+      <!-- 參與者管理（管理者） -->
+      <section id="tab-participants" class="panel admin-only hidden">
+        <div class="row">
           <h2>參與者管理</h2>
-          <form id="formParticipant" class="form grid">
+          <div class="muted" id="modeHint2"></div>
+        </div>
+
+        <div class="panelInner">
+          <h3>新增參與者</h3>
+          <form id="participantForm" class="form grid">
             <div class="field">
               <label>姓名</label>
-              <input name="name" placeholder="例：王小明" required />
+              <input id="pName" placeholder="例：王小明" required />
             </div>
             <div class="field">
               <label>Email</label>
-              <input name="email" type="email" placeholder="ming@test.com" required />
-            </div>
-            <div class="field">
-              <label>電話</label>
-              <input name="phone" placeholder="0912-345-678" />
+              <input id="pEmail" type="email" placeholder="ming@test.com" required />
             </div>
             <div class="field full">
+              <label>電話（可留空）</label>
+              <input id="pPhone" placeholder="0912-345-678" />
+            </div>
+
+            <div class="row fullRow">
               <button class="btn primary" type="submit">新增參與者</button>
+              <button class="btn ghost" type="button" id="reloadParticipantsBtn">重新載入</button>
             </div>
           </form>
         </div>
 
-        <div class="panel">
-          <h3>參與者列表</h3>
-          <table class="table" id="tableParticipants">
+        <div class="panelInner">
+          <div class="row">
+            <h3>參與者列表</h3>
+            <div class="muted" id="participantsCount"></div>
+          </div>
+          <table class="table">
             <thead>
               <tr>
                 <th>姓名</th>
                 <th>Email</th>
                 <th>電話</th>
-                <th style="width:120px;">操作</th>
+                <th>操作</th>
               </tr>
             </thead>
-            <tbody></tbody>
+            <tbody id="participantsTbody"></tbody>
           </table>
         </div>
       </section>
 
-      <!-- REGISTRATIONS -->
-      <section id="view-registrations" class="view hidden">
-        <div class="panel">
-          <h2>報名</h2>
-          <form id="formRegister" class="form grid">
+      <!-- 報名/名單/簽到（兩種模式都可用；但 user 模式只能看到這個 tab） -->
+      <section id="tab-registrations" class="panel">
+        <div class="row">
+          <h2>報名 / 名單 / 簽到</h2>
+          <div class="muted" id="modeHint3"></div>
+        </div>
+
+        <div class="panelInner">
+          <h3>活動報名</h3>
+          <form id="regForm" class="form grid">
             <div class="field">
               <label>選擇活動</label>
-              <select id="selEvent" required></select>
+              <select id="regEventSelect" required></select>
             </div>
             <div class="field">
               <label>選擇參與者</label>
-              <select id="selParticipant" required></select>
+              <select id="regParticipantSelect" required></select>
             </div>
-            <div class="field full">
+            <div class="row fullRow">
               <button class="btn primary" type="submit">送出報名</button>
-              <span class="muted">（同一參與者同一活動不可重複報名）</span>
+              <span class="muted">（系統會避免重複報名）</span>
             </div>
           </form>
         </div>
 
-        <div class="panel">
+        <div class="panelInner">
           <div class="row">
             <h3>名單 / 簽到</h3>
             <div class="rowRight">
-              <label class="muted">檢視活動：</label>
-              <select id="selRosterEvent"></select>
-              <button id="btnLoadRoster" class="btn">載入名單</button>
+              <select id="listEventSelect" aria-label="event list select"></select>
+              <button class="btn" id="refreshListBtn" type="button">載入名單</button>
             </div>
           </div>
 
-          <table class="table" id="tableRoster">
+          <table class="table">
             <thead>
               <tr>
                 <th>姓名</th>
                 <th>Email</th>
                 <th>電話</th>
                 <th>狀態</th>
-                <th style="width:220px;">操作</th>
+                <th>操作</th>
               </tr>
             </thead>
-            <tbody></tbody>
+            <tbody id="regsTbody"></tbody>
           </table>
+
+          <div class="muted" style="margin-top:10px">
+            * 簽到/取消簽到為示範流程；取消報名會刪除該筆報名紀錄。
+          </div>
         </div>
       </section>
-
     </section>
   </main>
 
