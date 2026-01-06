@@ -1,0 +1,39 @@
+@base = http://localhost:3001
+
+### 0) Health（如果你有 health）
+GET {{base}}/health
+
+### 1) 建立活動（Create Event）
+POST {{base}}/api/events
+Content-Type: application/json
+
+{
+  "title": "期末專題 Demo Day",
+  "date": "2026-01-20",
+  "location": "E201 教室",
+  "quota": 50,
+  "description": "活動報名系統展示"
+}
+
+### 2) 取得所有活動（List Events）
+GET {{base}}/api/events
+
+### 3) 取得單一活動（Get Event by Id）
+# 先跑 2) 取得列表，複製其中一筆 _id 貼到下面
+@event_id = PUT_EVENT_ID_HERE
+GET {{base}}/api/events/{{event_id}}
+
+### 4) 更新活動（Update Event）
+PUT {{base}}/api/events/{{event_id}}
+Content-Type: application/json
+
+{
+  "title": "期末專題 Demo Day（更新）",
+  "date": "2026-02-01",
+  "location": "線上",
+  "quota": 99,
+  "description": "已更新內容"
+}
+
+### 5) 刪除活動（Delete Event）
+DELETE {{base}}/api/events/{{event_id}}
