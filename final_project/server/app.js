@@ -4,6 +4,7 @@ import "dotenv/config";
 
 import { connectDB } from "./db.js";
 import eventsRoutes from "./routes/events.js";
+import participantsRoutes from "./routes/participants.js";
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/events", eventsRoutes);
+app.use("/api/participants", participantsRoutes);
 
 connectDB()
   .then(() => {
