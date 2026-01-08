@@ -168,6 +168,7 @@ li{margin:6px 0}
 /* ===== Role mode ===== */
 .hidden{display:none}
 body[data-mode="user"] .admin-only{display:none !important}
+body[data-mode="admin"] .user-only{display:none !important}
 
 /* ===== Toast ===== */
 .toast{

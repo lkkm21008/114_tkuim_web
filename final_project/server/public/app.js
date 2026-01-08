@@ -118,27 +118,31 @@ function activateTab(name) {
 function renderEventSelects() {
   const regEvent = el("regEventSelect");
   const listEvent = el("listEventSelect");
-  if (!regEvent || !listEvent) return;
+  const adminRegEvent = el("adminRegEventSelect");
 
   const options = events.map(e =>
     `<option value="${e._id}">${safeText(e.title)}（${safeText(fmtDate(e.date))}）</option>`
   ).join("");
 
-  regEvent.innerHTML = options || `<option value="">（尚無活動）</option>`;
-  listEvent.innerHTML = options || `<option value="">（尚無活動）</option>`;
+  const defaultOpt = `<option value="">（尚無活動）</option>`;
+
+  if (regEvent) regEvent.innerHTML = options || defaultOpt;
+  if (listEvent) listEvent.innerHTML = options || defaultOpt;
+  if (adminRegEvent) adminRegEvent.innerHTML = options || defaultOpt;
 }
 
 function renderParticipantSelect() {
-  // 管理者模式下其實不需要報名表單，所以不用再渲染 regParticipantSelect
-  // 但保留不影響
-  const sel = el("regParticipantSelect");
-  if (!sel) return;
+  const sel = el("regParticipantSelect"); // 可能不存在
+  const adminSel = el("adminRegParticipantSelect");
 
   const options = participants.map(p =>
     `<option value="${p._id}">${safeText(p.name)}（${safeText(p.email)}）</option>`
   ).join("");
 
-  sel.innerHTML = options || `<option value="">（尚無參與者）</option>`;
+  const defaultOpt = `<option value="">（尚無參與者）</option>`;
+
+  if (sel) sel.innerHTML = options || defaultOpt;
+  if (adminSel) adminSel.innerHTML = options || defaultOpt;
 }
 
 // ===== Render Tables =====
@@ -147,12 +151,18 @@ function renderEventsTable() {
   const cnt = el("eventsCount");
   if (!tbody) return;
 
-  if (cnt) cnt.textContent = `共 ${events.length} 筆`;
-
   const myRegs = JSON.parse(localStorage.getItem("my_regs") || "[]");
   const myRegsDetail = JSON.parse(localStorage.getItem("my_regs_detail") || "{}"); // { eventId: regId }
 
-  tbody.innerHTML = events.map(e => {
+  // User Mode: 只顯示已報名的活動
+  let displayEvents = events;
+  if (mode === "user") {
+    displayEvents = events.filter(e => myRegs.includes(e._id));
+  }
+
+  if (cnt) cnt.textContent = `共 ${displayEvents.length} 筆`;
+
+  tbody.innerHTML = displayEvents.map(e => {
     const isReg = myRegs.includes(e._id);
     const regId = myRegsDetail[e._id]; // Get registration ID if exists locally
     const statusBadge = isReg ? `<span class="badge ok">已報名</span>` : "";
@@ -183,7 +193,9 @@ function renderEventsTable() {
     </tr>
     `;
   }).join("") || `
-    <tr><td colspan="5" class="muted">目前沒有活動，請先新增。</td></tr>
+    <tr><td colspan="5" class="muted">
+      ${mode === 'user' ? "你尚未報名任何活動。" : "目前沒有活動，請先新增。"}
+    </td></tr>
   `;
 
   tbody.querySelectorAll('[data-act="delEvent"]').forEach(btn => {
@@ -468,6 +480,43 @@ function bindForms() {
       await loadParticipants();
     } catch (err) {
       showToast("err", `新增失敗：${err.message}`);
+    }
+  });
+
+  // 幫忙報名（管理者）
+  const adminRegForm = el("adminRegForm");
+  adminRegForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (mode === "user") return showToast("err", "此功能僅限管理者使用");
+
+    const eventId = el("adminRegEventSelect")?.value;
+    const participantId = el("adminRegParticipantSelect")?.value;
+
+    if (!eventId || !participantId) {
+      showToast("err", "請選擇活動與參與者");
+      return;
+    }
+
+    try {
+      await apiFetch(API.registrations, {
+        method: "POST",
+        body: JSON.stringify({ eventId, participantId }),
+      });
+      showToast("ok", "幫忙報名成功");
+
+      // Update list if needed
+      if (el("listEventSelect").value === eventId) {
+        await loadEventRegsIfNeeded();
+      } else {
+        el("listEventSelect").value = eventId;
+        await loadEventRegsIfNeeded();
+      }
+    } catch (err) {
+      if (err.status === 409) {
+        showToast("err", "此參與者已報名過該活動");
+      } else {
+        showToast("err", `報名失敗：${err.message}`);
+      }
     }
   });
 

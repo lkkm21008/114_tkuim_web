@@ -74,3 +74,13 @@ export async function cancel(registrationId) {
   const result = await db.collection(COL).deleteOne({ _id: rId });
   return result.deletedCount === 1;
 }
+
+export async function getRegistrationById(id) {
+  const db = getDB();
+  return db.collection(COL).findOne({ _id: new ObjectId(id) });
+}
+
+export async function countByParticipantId(participantId) {
+  const db = getDB();
+  return db.collection(COL).countDocuments({ participantId: new ObjectId(participantId) });
+}

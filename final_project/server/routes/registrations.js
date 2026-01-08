@@ -1,6 +1,7 @@
 import express from "express";
 import { ObjectId } from "mongodb";
-import { register, checkin, cancel } from "../repositories/registrationsRepo.js";
+import { register, checkin, cancel, getRegistrationById, countByParticipantId } from "../repositories/registrationsRepo.js";
+import { deleteParticipant } from "../repositories/participantsRepo.js";
 
 const router = express.Router();
 
@@ -40,7 +41,25 @@ router.delete("/:id", async (req, res) => {
     return res.status(400).json({ ok: false, error: "Invalid registration id" });
   }
 
+  // 1. 取得 registration 以便知道是哪個 participant
+  const reg = await getRegistrationById(id);
+  if (!reg) {
+    return res.status(404).json({ ok: false, error: "Registration not found" });
+  }
+  const pid = reg.participantId;
+
+  // 2. 刪除報名
   const ok = await cancel(id);
+
+  // 3. 檢查是否還有其他報名，若無則刪除參與者
+  if (ok && pid) {
+    const count = await countByParticipantId(pid);
+    if (count === 0) {
+      await deleteParticipant(pid);
+      // console.log(`Orphan participant ${pid} deleted.`);
+    }
+  }
+
   res.json({ ok });
 });
 

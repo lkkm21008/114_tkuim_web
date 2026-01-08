@@ -162,6 +162,24 @@
           <div class="muted" id="modeHint3"></div>
         </div>
 
+        <!-- 管理者模式：幫忙報名 -->
+        <div class="panelInner admin-only">
+          <h3>幫參與者報名（管理者）</h3>
+          <form id="adminRegForm" class="form grid">
+            <div class="field full">
+              <label>選擇活動</label>
+              <select id="adminRegEventSelect" required></select>
+            </div>
+            <div class="field full">
+              <label>選擇參與者</label>
+              <select id="adminRegParticipantSelect" required></select>
+            </div>
+            <div class="row fullRow">
+              <button class="btn primary" type="submit">幫他報名</button>
+            </div>
+          </form>
+        </div>
+
         <!-- 使用者模式：才顯示報名表單 -->
         <div class="panelInner user-only">
           <h3>活動報名（使用者）</h3>
