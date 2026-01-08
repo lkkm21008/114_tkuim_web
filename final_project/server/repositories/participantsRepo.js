@@ -5,10 +5,18 @@ const COLLECTION = "participants";
 
 export async function createParticipant(data) {
   const db = getDB();
+  const email = (data.email || "").toLowerCase();
+
+  // 檢查是否已存在 (Email 當作唯一識別)
+  const existing = await db.collection(COLLECTION).findOne({ email });
+  if (existing) {
+    // 若已存在，直接回傳舊的 (讓後續報名邏輯判斷 eventId+participantId 是否重複)
+    return existing;
+  }
 
   const doc = {
     name: data.name,
-    email: (data.email || "").toLowerCase(),
+    email: email,
     phone: data.phone || "",
     createdAt: new Date()
   };
