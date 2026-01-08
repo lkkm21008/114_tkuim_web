@@ -150,10 +150,19 @@ function renderEventsTable() {
   if (cnt) cnt.textContent = `共 ${events.length} 筆`;
 
   const myRegs = JSON.parse(localStorage.getItem("my_regs") || "[]");
+  const myRegsDetail = JSON.parse(localStorage.getItem("my_regs_detail") || "{}"); // { eventId: regId }
 
   tbody.innerHTML = events.map(e => {
     const isReg = myRegs.includes(e._id);
+    const regId = myRegsDetail[e._id]; // Get registration ID if exists locally
     const statusBadge = isReg ? `<span class="badge ok">已報名</span>` : "";
+
+    // User mode cancel button
+    let userActionBtn = "";
+    if (mode === "user" && isReg && regId) {
+      userActionBtn = `<button class="btn danger" data-act="userCancelReg" data-regid="${regId}" data-eventid="${e._id}">取消報名</button>`;
+    }
+
     const delBtn = mode === "admin"
       ? `<button class="btn danger" data-act="delEvent" data-id="${e._id}">刪除</button>`
       : "";
@@ -169,6 +178,7 @@ function renderEventsTable() {
       <td>${safeText(e.quota)}</td>
       <td>
         ${delBtn}
+        ${userActionBtn}
       </td>
     </tr>
     `;
@@ -188,6 +198,35 @@ function renderEventsTable() {
         await loadEventRegsIfNeeded();
       } catch (e) {
         showToast("err", `刪除失敗：${e.message}`);
+      }
+    });
+  });
+
+  // 使用者取消報名
+  tbody.querySelectorAll('[data-act="userCancelReg"]').forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const regId = btn.dataset.regid;
+      const eventId = btn.dataset.eventid;
+      if (!confirm("確定要取消報名這個活動嗎？")) return;
+
+      try {
+        await apiFetch(API.cancelReg(regId), { method: "DELETE" });
+        showToast("ok", "已取消報名");
+
+        // Update LocalStorage
+        const myRegs = JSON.parse(localStorage.getItem("my_regs") || "[]");
+        const myRegsDetail = JSON.parse(localStorage.getItem("my_regs_detail") || "{}");
+
+        const newMyRegs = myRegs.filter(id => id !== eventId);
+        delete myRegsDetail[eventId];
+
+        localStorage.setItem("my_regs", JSON.stringify(newMyRegs));
+        localStorage.setItem("my_regs_detail", JSON.stringify(myRegsDetail));
+
+        await loadEvents();
+        await loadEventRegsIfNeeded();
+      } catch (e) {
+        showToast("err", `取消失敗：${e.message}`);
       }
     });
   });
@@ -461,7 +500,7 @@ function bindForms() {
       if (!participantId) throw new Error("建立參與者失敗（未取得 participantId）");
 
       // 2) 建立報名
-      await apiFetch(API.registrations, {
+      const result = await apiFetch(API.registrations, {
         method: "POST",
         body: JSON.stringify({ eventId, participantId }),
       });
@@ -471,10 +510,16 @@ function bindForms() {
 
       // Update LocalStorage
       const myRegs = JSON.parse(localStorage.getItem("my_regs") || "[]");
+      const myRegsDetail = JSON.parse(localStorage.getItem("my_regs_detail") || "{}");
+
       if (!myRegs.includes(eventId)) {
         myRegs.push(eventId);
         localStorage.setItem("my_regs", JSON.stringify(myRegs));
       }
+
+      const regId = result.registration._id;
+      myRegsDetail[eventId] = regId;
+      localStorage.setItem("my_regs_detail", JSON.stringify(myRegsDetail));
 
       // 更新名單
       el("listEventSelect").value = eventId;
