@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>登入 - 活動報名系統</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="center-body">
+  <div class="card auth-card">
+    <div class="auth-header">
+      <h1>登入系統</h1>
+      <p>請輸入您的帳號密碼</p>
+    </div>
+    
+    <form id="loginForm" class="form grid">
+      <div class="field full">
+        <label>Email</label>
+        <input id="email" type="email" required placeholder="user@test.com" />
+      </div>
+      <div class="field full">
+        <label>密碼</label>
+        <input id="password" type="password" required placeholder="******" />
+      </div>
+      
+      <div class="row fullRow">
+        <button class="btn primary full-width" type="submit">登入</button>
+      </div>
+    </form>
+
+    <div class="auth-footer">
+      <p>還沒有帳號？ <a href="./register.html">立即註冊</a></p>
+    </div>
+    <div id="msg" class="errMsg hidden"></div>
+  </div>
+
+  <script src="./app.js"></script>
+  <script>
+    // Simple inline script for login page specific logic that leverages app.js helpers if possible,
+    // or we can put it all in app.js. For simplicity, we can do it here or let app.js detect page.
+    // Let's rely on app.js to handle the form if we add a recognizable ID, or just write it here.
+    
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const msg = document.getElementById('msg');
+      
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        
+        if (data.ok) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          window.location.href = './index.html';
+        } else {
+            msg.textContent = data.error || '登入失敗';
+            msg.classList.remove('hidden');
+        }
+      } catch (err) {
+        msg.textContent = '連線錯誤';
+        msg.classList.remove('hidden');
+      }
+    });
+
+    // Clear token on login page load
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  </script>
+</body>
+</html>

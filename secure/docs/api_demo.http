@@ -1,0 +1,79 @@
+@baseUrl = http://localhost:3001/api
+
+### 1. [Input Validation] Register - Invalid Email (Should 400)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "name": "Test User",
+    "email": "bad-email",
+    "password": "123",
+    "phone": "0912345678"
+}
+
+### [Input Validation] Register - Password Too Short (Should 400)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "name": "Test User",
+    "email": "good@email.com",
+    "password": "123",
+    "phone": "0912345678"
+}
+
+### 2. Login - Admin (Success)
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "admin@test.com",
+    "password": "admin123"
+}
+
+### 3. Login - User (Success)
+# @name userLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "user@test.com",
+    "password": "user123"
+}
+
+@userToken = {{userLogin.response.body.token}}
+@adminToken = {{adminLogin.response.body.token}}
+
+### 4. [RBAC] Create Event - User (Should 403 Forbidden)
+POST {{baseUrl}}/events
+Content-Type: application/json
+Authorization: Bearer {{userToken}}
+
+{
+    "title": "Hacked Event",
+    "date": "2025-01-01",
+    "quota": 100
+}
+
+### [RBAC] Create Event - Admin (Should 200 OK)
+POST {{baseUrl}}/events
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+    "title": "Secure Event",
+    "date": "2025-12-31",
+    "quota": 50,
+    "description": "Created by Admin"
+}
+
+### 5. [Rate Limit] Spam Login (Send 6 times to trigger 429)
+# Click "Send Request" repeatedly
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "user@test.com",
+    "password": "wrongpassword"
+}

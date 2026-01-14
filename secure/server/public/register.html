@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>註冊 - 活動報名系統</title>
+    <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body class="center-body">
+    <div class="card auth-card">
+        <div class="auth-header">
+            <h1>註冊帳號</h1>
+            <p>建立您的新帳戶</p>
+        </div>
+
+        <form id="regForm" class="form grid">
+            <div class="field full">
+                <label>姓名</label>
+                <input id="name" type="text" required placeholder="王小明" />
+            </div>
+            <div class="field full">
+                <label>Email</label>
+                <input id="email" type="email" required placeholder="user@example.com" />
+            </div>
+            <div class="field full">
+                <label>密碼</label>
+                <input id="password" type="password" required minlength="6" placeholder="至少 6 碼" />
+            </div>
+            <div class="field full">
+                <label>電話</label>
+                <input id="phone" type="text" required placeholder="0912-345-678" />
+            </div>
+
+            <div class="row fullRow">
+                <button class="btn primary full-width" type="submit">註冊</button>
+            </div>
+        </form>
+
+        <div class="auth-footer">
+            <p>已有帳號？ <a href="./login.html">登入</a></p>
+        </div>
+        <div id="msg" class="errMsg hidden"></div>
+    </div>
+
+    <script src="./app.js"></script>
+    <script>
+        document.getElementById('regForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const phone = document.getElementById('phone').value;
+            const msg = document.getElementById('msg');
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password, phone })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    alert('註冊成功！請登入。');
+                    window.location.href = './login.html';
+                } else {
+                    msg.textContent = data.error || '註冊失敗';
+                    msg.classList.remove('hidden');
+                }
+            } catch (err) {
+                msg.textContent = '連線錯誤';
+                msg.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+
+</html>
