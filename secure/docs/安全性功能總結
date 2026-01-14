@@ -1,0 +1,70 @@
+安全性功能增強總結
+我已經完成前端與後端的 3 大關鍵安全增強功能。
+
+1. 路由保護 (Route Protection)
+目標：確保使用者無法進入未授權頁面，不僅依賴後端擋 API，前端也要做 UI 阻擋。
+
+實作方式：
+在 
+app.js
+ 的 
+bindNav
+ 函式中加入嚴格檢查。
+一般使用者 (User)：禁止點擊進入「參與者管理」頁面 (Admin Only)。若嘗試點擊，會跳出「權限不足」錯誤且不切換分頁。
+未登入訪客：進入 
+index.html
+ 時會被 
+checkLogin
+ 強制導向回登入頁面；點擊選單也會再次檢查 authToken。
+2. XSS 防護 (Anti-XSS)
+目標：防止惡意腳本透過 innerHTML 注入 (Stored XSS)。
+
+實作方式：
+移除 innerHTML：全面重構 
+app.js
+ 中的表格渲染邏輯。
+改用 DOM 方法：使用 document.createElement, textContent，確保資料不會被執行。
+3. Token 安全策略 (Token Security)
+目標：說明 Token 儲存風險與最佳實務。
+
+目前實作：localStorage (方便但有 XSS 風險)。
+緩解措施：也就是上述的 XSS 防護。只要網站沒有 XSS 漏洞，localStorage 也是相對安全的。
+建議：正式環境建議改用 HttpOnly Cookie。
+手動驗證流程 (Manual Verification Guide)
+請依照以下步驟驗證剛完成的安全機制：
+
+ 測試一：XSS 防護測試 (Stored XSS)
+目標：確保惡意程式碼不會被執行。
+
+登入管理員：
+帳號：admin@test.com / 密碼：admin123
+新增惡意活動：
+活動名稱輸入：<img src=x onerror=alert('XSS攻擊成功')>
+其他欄位隨意填寫，點擊「新增活動」。
+驗證結果：
+預期：列表上直接顯示該段 HTML 文字串，不會跳出彈窗。
+失敗：若跳出 Alert 視窗，代表防護失敗。
+ 測試二：路由權限保護
+目標：確保一般使用者無法闖入管理頁面。
+
+登入一般使用者：
+點擊登出，改用 user@test.com / user123 登入。
+嘗試越權：
+點擊左側選單的「參與者管理」。
+驗證結果：
+預期：右上方跳出紅字「權限不足：此頁面僅限管理者存取」，且畫面停留在原處，沒有切換過去。
+ 測試三：Token 安全與登出
+檢查 Token：
+按 F12 開啟開發者工具 -> Application -> Local Storage。
+確認 token 存在。
+登出清除：
+點擊右上角「登出」按鈕。
+確認畫面跳轉回 
+login.html
+。
+再次檢查 Local Storage，確認 token 已被清除。
+ 測試四：必填欄位驗證 (電話)
+註冊測試：
+在註冊頁面或使用者報名表單，故意不填寫電話。
+點擊送出。
+預期：瀏覽器會跳出提示「請填寫此欄位」或右上方紅字提示錯誤，無法送出。
